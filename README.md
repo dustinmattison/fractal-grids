@@ -13,7 +13,17 @@ An interactive educational platform for creating and displaying hierarchical, bi
 npm install
 ```
 
-### 2. Start the Server
+### 2. Add Your Media Files
+**Important**: Media files (videos/audio) are NOT included in this repository due to their large size.
+
+Place your media files in:
+- `grids/videos/` - Video files (.mp4)
+- `grids/audio/` - Audio files (.mp3, .m4a)
+- `grids/images/` - Image files (.jpg, .png, .webp)
+
+See the README files in each folder for naming conventions and organization tips.
+
+### 3. Start the Server
 ```bash
 npm start
 ```

@@ -21,6 +21,18 @@ Thumbs.db
 *.swp
 *.swo
 
+# Media files (too large for GitHub)
+# Store these locally on your teaching computer
+grids/videos/*.mp4
+grids/videos/*.mp3
+grids/audio/*.mp3
+grids/audio/*.m4a
+
+# Keep README files in media folders
+!grids/videos/README.md
+!grids/audio/README.md
+!grids/images/README.md
+
 # Optional: Uncomment if you don't want to track grids in git
 # grids/*.html
 # !grids/.gitkeep
