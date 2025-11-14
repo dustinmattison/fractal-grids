@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimedia Fractal Grid Template - With Images, Audio & Video</title>
+    <meta name="description" content="Enhanced fractal grid template with support for images, audio podcasts, and video files with download capability">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, serif;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+            transition: padding 0.3s ease;
+        }
+
+        body.fullscreen-mode {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        body.fullscreen-mode .header {
+            display: none;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #333;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #f5f5f5;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #ccc;
+            transition: all 0.3s ease;
+        }
+
+        body.fullscreen-mode .controls {
+            position: fixed;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.97);
+            padding: 5px 10px;
+            margin-bottom: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 2px solid #333;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        body.fullscreen-mode .btn {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            border-width: 1px;
+        }
+
+        .btn:hover {
+            background: #f0f0f0;
+            border-color: #000;
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn.flip-all {
+            background: #8B0000;
+            color: white;
+            border-color: #000;
+        }
+
+        .btn.flip-all:hover {
+            background: #660000;
+        }
+
+        .btn.lang-toggle {
+            background: #1B4F72;
+            color: white;
+        }
+
+        .btn.lang-toggle:hover {
+            background: #0E2A3F;
+        }
+
+        .btn.fullscreen {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .btn.fullscreen:hover {
+            background: #1a252f;
+        }
+
+        .btn.back {
+            background: #e8e8e8;
+        }
+
+        .level-indicator {
+            padding: 6px 16px;
+            border: 2px solid #000;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        body.fullscreen-mode .level-indicator {
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-width: 1px;
+        }
+
+        .grid-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            perspective: 1000px;
+            transition: all 0.3s ease;
+        }
+
+        body.fullscreen-mode .grid-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 95vw;
+            width: 95vw;
+            max-height: calc(100vh - 60px);
+            height: calc(100vh - 60px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid {
+            display: grid;
+            gap: 15px;
+            transition: all 0.6s ease;
+            width: 100%;
+        }
+
+        .grid.level-0 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid.level-1 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid.level-2 {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        body.fullscreen-mode .grid.level-2 {
+            gap: 6px;
+            max-height: calc(100vh - 70px);
+            overflow: hidden;
+        }
+
+        .grid.level-2-5 {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding-top: 30px;
+        }
+
+        .cell-container {
+            perspective: 1000px;
+            min-height: 200px;
+        }
+
+        body.fullscreen-mode .grid.level-2 .cell-container {
+            min-height: 80px;
+        }
+
+        body.fullscreen-mode .grid.level-2 .subgrid .cell-container {
+            min-height: 60px;
+        }
+
+        .grid.level-0 .cell-container {
+            min-height: 400px;
+        }
+
+        .grid.level-2-5 .cell-container {
+            min-height: 180px;
+        }
+
+        .cell-flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .cell-container.flipped .cell-flipper {
+            transform: rotateY(180deg);
+        }
+
+        .global-flip .cell-flipper {
+            transform: rotateY(180deg);
+        }
+
+        .global-flip .cell-container.flipped .cell-flipper {
+            transform: rotateY(0deg);
+        }
+
+        .cell {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.fullscreen-mode .cell {
+            padding: 10px;
+            font-size: 0.75rem;
+        }
+
+        .subgrid .cell {
+            padding: 8px;
+            font-size: 0.65rem;
+        }
+
+        body.fullscreen-mode .subgrid .cell {
+            padding: 4px;
+            font-size: 0.55rem;
+        }
+
+        .cell:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .cell.front {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+        }
+
+        .cell.back {
+            background: linear-gradient(135deg, #fffaf0 0%, #fff5e6 100%);
+            transform: rotateY(180deg);
+        }
+
+        .cell.subsun {
+            background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+            border: 2px solid #333;
+            font-weight: bold;
+        }
+
+        .cell.back.subsun {
+            background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+            border: 2px solid #333;
+        }
+
+        /* Position-based colors for L1 planets, L2 subsuns, and central 3x3 grid in L2 */
+        .grid.level-1 .cell.pos-1,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-1,
+        .cell.subsun.pos-1 { background: linear-gradient(135deg, #ffe6e6 0%, #ffcccc 100%); }
+        .grid.level-1 .cell.back.pos-1,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-1,
+        .cell.back.subsun.pos-1 { background: linear-gradient(135deg, #ffe6e6 0%, #ffcccc 100%); }
+        
+        .grid.level-1 .cell.pos-2,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-2,
+        .cell.subsun.pos-2 { background: linear-gradient(135deg, #e6f2ff 0%, #cce5ff 100%); }
+        .grid.level-1 .cell.back.pos-2,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-2,
+        .cell.back.subsun.pos-2 { background: linear-gradient(135deg, #e6f2ff 0%, #cce5ff 100%); }
+        
+        .grid.level-1 .cell.pos-3,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-3,
+        .cell.subsun.pos-3 { background: linear-gradient(135deg, #e6ffe6 0%, #ccffcc 100%); }
+        .grid.level-1 .cell.back.pos-3,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-3,
+        .cell.back.subsun.pos-3 { background: linear-gradient(135deg, #e6ffe6 0%, #ccffcc 100%); }
+        
+        .grid.level-1 .cell.pos-4,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-4,
+        .cell.subsun.pos-4 { background: linear-gradient(135deg, #fff0e6 0%, #ffe0cc 100%); }
+        .grid.level-1 .cell.back.pos-4,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-4,
+        .cell.back.subsun.pos-4 { background: linear-gradient(135deg, #fff0e6 0%, #ffe0cc 100%); }
+        
+        .grid.level-1 .cell.pos-6,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-6,
+        .cell.subsun.pos-6 { background: linear-gradient(135deg, #f0e6ff 0%, #e0ccff 100%); }
+        .grid.level-1 .cell.back.pos-6,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-6,
+        .cell.back.subsun.pos-6 { background: linear-gradient(135deg, #f0e6ff 0%, #e0ccff 100%); }
+        
+        .grid.level-1 .cell.pos-7,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-7,
+        .cell.subsun.pos-7 { background: linear-gradient(135deg, #ffe6f0 0%, #ffcce0 100%); }
+        .grid.level-1 .cell.back.pos-7,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-7,
+        .cell.back.subsun.pos-7 { background: linear-gradient(135deg, #ffe6f0 0%, #ffcce0 100%); }
+        
+        .grid.level-1 .cell.pos-8,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-8,
+        .cell.subsun.pos-8 { background: linear-gradient(135deg, #e6ffff 0%, #ccffff 100%); }
+        .grid.level-1 .cell.back.pos-8,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-8,
+        .cell.back.subsun.pos-8 { background: linear-gradient(135deg, #e6ffff 0%, #ccffff 100%); }
+        
+        .grid.level-1 .cell.pos-9,
+        .grid.level-2 .subgrid:nth-child(5) .cell.pos-9,
+        .cell.subsun.pos-9 { background: linear-gradient(135deg, #ffffe6 0%, #ffffcc 100%); }
+        .grid.level-1 .cell.back.pos-9,
+        .grid.level-2 .subgrid:nth-child(5) .cell.back.pos-9,
+        .cell.back.subsun.pos-9 { background: linear-gradient(135deg, #ffffe6 0%, #ffffcc 100%); }
+
+        .cell-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #222;
+        }
+
+        body.fullscreen-mode .cell-title {
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .subgrid .cell-title {
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            line-height: 1.1;
+        }
+
+        body.fullscreen-mode .subgrid .cell-title {
+            font-size: 0.6rem;
+            margin-bottom: 2px;
+        }
+
+        .cell-content {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        body.fullscreen-mode .cell-content {
+            font-size: 0.7rem;
+            line-height: 1.3;
+        }
+
+        .subgrid .cell-content {
+            font-size: 0.6rem;
+            line-height: 1.2;
+        }
+
+        body.fullscreen-mode .subgrid .cell-content {
+            font-size: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .flip-indicator {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            font-size: 1.2rem;
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+        }
+
+        body.fullscreen-mode .flip-indicator {
+            font-size: 0.8rem;
+            bottom: 4px;
+            right: 4px;
+        }
+
+        .cell:hover .flip-indicator {
+            opacity: 0.8;
+        }
+
+        /* Multimedia Styles */
+        .cell-image {
+            width: 100%;
+            height: auto;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        body.fullscreen-mode .cell-image {
+            max-height: 80px;
+            margin-bottom: 5px;
+        }
+
+        .subgrid .cell-image {
+            max-height: 60px;
+            margin-bottom: 5px;
+        }
+
+        .media-controls {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        body.fullscreen-mode .media-controls {
+            margin-top: 5px;
+            padding-top: 4px;
+            gap: 3px;
+        }
+
+        .media-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #555;
+            flex-wrap: wrap;
+        }
+
+        body.fullscreen-mode .media-item {
+            font-size: 0.6rem;
+            gap: 4px;
+        }
+
+        .subgrid .media-item {
+            font-size: 0.65rem;
+            gap: 4px;
+        }
+
+        .media-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        body.fullscreen-mode .media-icon {
+            font-size: 0.9rem;
+        }
+
+        .media-title {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .media-btn {
+            padding: 4px 10px;
+            border: 1px solid #666;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: #333;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .media-btn:hover {
+            background: #f0f0f0;
+            border-color: #000;
+        }
+
+        body.fullscreen-mode .media-btn {
+            padding: 2px 6px;
+            font-size: 0.6rem;
+        }
+
+        .media-player {
+            width: 100%;
+            margin-top: 8px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .media-player.active {
+            display: block;
+        }
+
+        .media-player audio,
+        .media-player video {
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        .media-size {
+            font-size: 0.75rem;
+            color: #888;
+            margin-left: 4px;
+        }
+
+        .subgrid {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+
+        /* Black border around central 3x3 grid in L2 */
+        .grid.level-2 .subgrid:nth-child(5) {
+            border: 4px solid #000;
+            background: #fff;
+        }
+
+        /* Thick border for VIOLENT EARTH in L1 */
+        .grid.level-1 .cell-container:nth-child(5) .cell.subsun {
+            border: 8px solid #000;
+        }
+
+        /* Extra thick border for VIOLENT EARTH (the true center of the entire 9x9) */
+        .grid.level-2 .subgrid:nth-child(5) .cell-container:nth-child(5) .cell.subsun {
+            border: 8px solid #000;
+        }
+
+        body.fullscreen-mode .subgrid {
+            gap: 4px;
+            padding: 4px;
+            border-width: 2px;
+        }
+
+        .grid.level-2 .subgrid:hover {
+            border-color: #333;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Prevent hover effects on L2 overview cells to avoid flickering */
+        .grid.level-2 .subgrid .cell:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: none;
+        }
+
+        .subgrid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0);
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 0;
+        }
+
+        .subgrid-overlay:hover {
+            background: rgba(0, 0, 0, 0.05);
+            font-size: 1.5rem;
+        }
+
+        body.fullscreen-mode .subgrid-overlay:hover {
+            font-size: 1rem;
+        }
+
+        .subgrid-overlay:hover::after {
+            content: "🔍 Click to Zoom";
+            color: #333;
+            font-weight: bold;
+            text-shadow: 0 0 10px white;
+        }
+
+        .subgrid .cell-container {
+            min-height: 60px;
+        }
+
+        body.fullscreen-mode .subgrid .cell-container {
+            min-height: 50px;
+        }
+
+        .subgrid-title {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #222;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e6f3ff 0%, #cce7ff 100%);
+            border: 2px solid #0066cc;
+            border-radius: 8px;
+        }
+
+        body.fullscreen-mode .subgrid-title {
+            font-size: 1rem;
+            padding: 5px;
+            margin-bottom: 5px;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+            .controls {
+                display: none;
+            }
+            .header {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📱 Multimedia Fractal Grid Template</h1>
+        <p>Interactive 9×9 Grid with Images, Audio & Video Support</p>
+    </div>
+
+    <div class="controls">
+        <button id="zoomIn" class="btn">Zoom In ➕</button>
+        <span id="levelIndicator" class="level-indicator">Level 1: Sacred Summits Overview</span>
+        <button id="zoomOut" class="btn">Zoom Out ➖</button>
+        <button id="backBtn" class="btn back" style="display: none;">◀ Back to L2</button>
+        <button id="flipAll" class="btn flip-all">Flip All 🔄</button>
+        <button id="langToggle" class="btn lang-toggle">UI Language: EN 🌐</button>
+        <button id="fullscreen" class="btn fullscreen">Presentation Mode 🖥️</button>
+    </div>
+
+    <div id="gridContainer" class="grid-container">
+        <div id="grid" class="grid level-1"></div>
+    </div>
+
+    <script>
+        const contentData = {
+            L0: [
+                {
+                    titleEn: "VIOLENT EARTH",
+                    titleZh: "暴烈地球",
+                    contentEn: "Sacred Summits",
+                    contentZh: "神圣高峰",
+                    descEn: "Volcanic mountains as creators and destroyers - life-giving fertile soils and life-threatening eruptions",
+                    descZh: "火山山脉作为创造者和毁灭者 - 赋予生命的肥沃土壤和威胁生命的喷发",
+                    cellClass: "subsun"
+                }
+            ],
+            L1: [
+                {
+                    titleEn: "Mount Fuji", 
+                    titleZh: "富士山", 
+                    contentEn: "Japan's sacred mountain", 
+                    contentZh: "日本的神圣山脉", 
+                    descEn: "3,776m, last erupted 1707", 
+                    descZh: "海拔3,776米，最后喷发于1707年", 
+                    cellClass: "",
+                    // MULTIMEDIA EXAMPLE: Add image
+                    image: "images/mount-fuji.jpg",
+                    imageAlt: "Mount Fuji snow-capped peak"
+                },
+                {
+                    titleEn: "Volcanic Threats", 
+                    titleZh: "火山威胁", 
+                    contentEn: "Dangers posed", 
+                    contentZh: "构成的危险", 
+                    descEn: "Ash, lava, displacement", 
+                    descZh: "火山灰、熔岩、流离失所", 
+                    cellClass: "",
+                    // MULTIMEDIA EXAMPLE: Add audio podcast
+                    audioUrl: "audio/volcanic-threats-podcast.mp3",
+                    audioTitle: "Understanding Volcanic Dangers (12 min)",
+                    audioSize: "8.5 MB"
+                },
+                {
+                    titleEn: "Scientific Monitoring", 
+                    titleZh: "科学监测", 
+                    contentEn: "Tracking activity", 
+                    contentZh: "追踪活动", 
+                    descEn: "Earthquake detection", 
+                    descZh: "地震检测", 
+                    cellClass: "",
+                    // MULTIMEDIA EXAMPLE: Add video
+                    videoUrl: "videos/monitoring-systems.mp4",
+                    videoTitle: "Seismic Monitoring Technology (8 min)",
+                    videoSize: "45 MB",
+                    videoPoster: "images/monitoring-thumbnail.jpg"
+                },
+                {titleEn: "Popocatépetl", titleZh: "波波卡特佩特火山", contentEn: "Mexico's smoking mountain", contentZh: "墨西哥的冒烟之山", descEn: "World's tallest active", descZh: "世界最高活火山", cellClass: ""},
+                {titleEn: "VIOLENT EARTH", titleZh: "暴烈地球", contentEn: "Sacred summits", contentZh: "神圣高峰", descEn: "Creators and destroyers", descZh: "创造者和毁灭者", cellClass: "subsun"},
+                {titleEn: "Religious Significance", titleZh: "宗教意义", contentEn: "Spiritual meaning", contentZh: "精神意义", descEn: "Sacred holy sites", descZh: "神圣圣地", cellClass: ""},
+                {titleEn: "Human Settlement", titleZh: "人类定居", contentEn: "Living near danger", contentZh: "居住在危险附近", descEn: "Rich volcanic soils", descZh: "富含火山土壤", cellClass: ""},
+                {titleEn: "Cultural Practices", titleZh: "文化习俗", contentEn: "Honoring volcanoes", contentZh: "崇敬火山", descEn: "Ceremonies and rituals", descZh: "仪式和典礼", cellClass: ""},
+                {titleEn: "Pacific Ring of Fire", titleZh: "环太平洋火山带", contentEn: "Volcanic zone", contentZh: "火山地带", descEn: "Tectonic plate boundaries", descZh: "构造板块边界", cellClass: ""}
+            ],
+            L2: [
+                // SUBGRID 1 (Top-Left): Mount Fuji expanded
+                {
+                    titleEn: "Mount Fuji",
+                    titleZh: "富士山",
+                    cells: [
+                        {
+                            titleEn: "Geographical Prominence", 
+                            titleZh: "地理显著性", 
+                            contentEn: "3,776m elevation", 
+                            contentZh: "海拔3,776米", 
+                            descEn: "Highest point", 
+                            descZh: "最高点", 
+                            cellClass: "", 
+                            fullContentEn: "Standing at 3,776 meters, Mount Fuji dominates the landscape as Japan's highest point, visible from Tokyo on clear days.", 
+                            fullContentZh: "富士山海拔3,776米，作为日本最高点主导着景观，在晴朗的日子里可以从东京看到。",
+                            // MULTIMEDIA EXAMPLE: Complete cell with all media types
+                            image: "images/fuji-prominence.jpg",
+                            imageAlt: "Mount Fuji towering over the landscape",
+                            audioUrl: "audio/fuji-geography.mp3",
+                            audioTitle: "Geographic Significance Explained (5 min)",
+                            audioSize: "4.2 MB",
+                            videoUrl: "videos/fuji-aerial-view.mp4",
+                            videoTitle: "Aerial Tour of Mount Fuji (3 min)",
+                            videoSize: "28 MB",
+                            videoPoster: "images/fuji-aerial-thumb.jpg"
+                        },
+                        {titleEn: "Volcanic Classification", titleZh: "火山分类", contentEn: "Dormant stratovolcano", contentZh: "休眠层状火山", descEn: "Capable of eruption", descZh: "能够喷发", cellClass: "", fullContentEn: "Scientists classify Fuji as a dormant stratovolcano, meaning it remains capable of eruption despite its current inactive state.", fullContentZh: "科学家将富士山分类为休眠的层状火山，意味着尽管目前处于非活跃状态，它仍然能够喷发。"},
+                        {titleEn: "Historical Eruption Pattern", titleZh: "历史喷发模式", contentEn: "1707 Hōei eruption", contentZh: "1707年宝永喷发", descEn: "Major ash deposits", descZh: "大量火山灰", cellClass: "", fullContentEn: "The 1707 Hōei eruption deposited substantial ash across the Edo region, demonstrating the volcano's destructive potential.", fullContentZh: "1707年宝永喷发在江户地区沉积了大量火山灰，展示了火山的破坏潜力。"},
+                        {titleEn: "Urban Proximity Risks", titleZh: "城市邻近风险", contentEn: "112 km from Tokyo", contentZh: "距东京112公里", descEn: "Threatens metropolis", descZh: "威胁大都市", cellClass: "", fullContentEn: "Located merely 112 kilometers from Tokyo, Fuji poses significant threats to one of the world's largest metropolitan populations.", fullContentZh: "富士山距离东京仅112公里，对世界上最大的大都市人口之一构成重大威胁。"},
+                        {titleEn: "Mount Fuji", titleZh: "富士山", contentEn: "Japan's sacred mountain", contentZh: "日本的神圣山脉", descEn: "3,776m, last erupted 1707", descZh: "海拔3,776米，最后喷发于1707年", cellClass: "subsun", fullContentEn: "Mount Fuji represents Japan's most iconic natural landmark, combining geological significance with profound cultural meaning for the Japanese people.", fullContentZh: "富士山代表日本最具标志性的自然地标，将地质意义与日本人民的深刻文化意义相结合。"},
+                        {titleEn: "Population Exposure", titleZh: "人口暴露", contentEn: "4 million at risk", contentZh: "400万人风险", descEn: "Direct impact zone", descZh: "直接影响区", cellClass: "", fullContentEn: "Approximately four million residents inhabit areas that would face direct consequences from a major eruption event.", fullContentZh: "约400万居民居住在将面临重大喷发事件直接后果的地区。"},
+                        {titleEn: "Tourism and Pilgrimage", titleZh: "旅游和朝圣", contentEn: "Climbing season", contentZh: "登山季节", descEn: "Hundreds of thousands", descZh: "数十万游客", cellClass: "", fullContentEn: "The official climbing season attracts hundreds of thousands of visitors seeking both recreational and spiritual experiences.", fullContentZh: "官方登山季节吸引了数十万寻求娱乐和精神体验的游客。"},
+                        {titleEn: "Religious Traditions", titleZh: "宗教传统", contentEn: "Shinto beliefs", contentZh: "神道教信仰", descEn: "Holy site", descZh: "圣地", cellClass: "", fullContentEn: "Shinto beliefs attribute sacred qualities to the mountain, establishing it as a holy site for centuries of worship.", fullContentZh: "神道教信仰将神圣品质归于这座山，使其成为数个世纪崇拜的圣地。"},
+                        {titleEn: "Cultural Symbolism", titleZh: "文化象征", contentEn: "National symbol", contentZh: "国家象征", descEn: "Japanese identity", descZh: "日本身份", cellClass: "", fullContentEn: "Fuji serves as Japan's national symbol, appearing in countless artistic works and representing Japanese identity globally.", fullContentZh: "富士山作为日本的国家象征，出现在无数艺术作品中，代表着全球范围内的日本身份。"}
+                    ]
+                },
+                // SUBGRID 2: Volcanic Threats
+                {
+                    titleEn: "Volcanic Threats",
+                    titleZh: "火山威胁",
+                    cells: [
+                        {titleEn: "Ash Cloud Dispersion", titleZh: "火山灰云扩散", contentEn: "Volcanic ash can travel hundreds of kilometers, creating darkness, contaminating water supplies, and disrupting aviation systems.", contentZh: "火山灰可以传播数百公里，造成黑暗，污染水源，并扰乱航空系统。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Lava Flow Destruction", titleZh: "熔岩流破坏", contentEn: "Molten rock exceeding 1,000°C advances slowly but inevitably, incinerating structures and permanently altering landscapes.", contentZh: "超过1,000°C的熔融岩石缓慢但不可避免地推进，焚烧建筑物并永久改变景观。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Pyroclastic Flow Velocity", titleZh: "火山碎屑流速度", contentEn: "Superheated gas and rock fragments can race down slopes at speeds exceeding 700 kilometers per hour.", contentZh: "过热的气体和岩石碎片可以以超过每小时700公里的速度沿斜坡飞驰。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Evacuation Imperatives", titleZh: "疏散必要性", contentEn: "Authorities must coordinate mass population movements, as demonstrated by the 26,000 people displaced during El Popo's 2000 event.", contentZh: "当局必须协调大规模人口迁移，正如波波火山2000年事件期间流离失所的26,000人所证明的那样。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Volcanic Threats", titleZh: "火山威胁", contentEn: "Dangers posed", contentZh: "构成的危险", descEn: "Ash, lava, displacement", descZh: "火山灰、熔岩、流离失所", cellClass: "subsun", fullContentEn: "Volcanic eruptions generate diverse catastrophic phenomena that threaten human life, infrastructure, and economic stability across vast regions.", fullContentZh: "火山喷发产生多样化的灾难性现象，威胁广大地区的人类生命、基础设施和经济稳定。"},
+                        {titleEn: "Economic Devastation", titleZh: "经济破坏", contentEn: "Property destruction eliminates housing, agricultural lands, and business infrastructure, creating long-term financial hardship.", contentZh: "财产破坏消除了住房、农业用地和商业基础设施，造成长期财务困难。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Mortality Statistics", titleZh: "死亡率统计", contentEn: "Historical eruptions have caused thousands of deaths, with future events potentially threatening even larger populations.", contentZh: "历史上的喷发已造成数千人死亡，未来事件可能威胁更大的人口。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Infrastructure Collapse", titleZh: "基础设施崩溃", contentEn: "Roads, bridges, communication networks, and utilities suffer severe damage, isolating affected communities.", contentZh: "道路、桥梁、通讯网络和公用事业遭受严重损害，使受影响的社区孤立无援。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Climate Modification", titleZh: "气候改变", contentEn: "Major eruptions inject particles into the stratosphere, potentially causing global temperature decreases and agricultural disruption.", contentZh: "重大喷发将颗粒注入平流层，可能导致全球温度下降和农业中断。", descEn: "", descZh: "", cellClass: ""}
+                    ]
+                },
+                // SUBGRID 3: Scientific Monitoring
+                {
+                    titleEn: "Scientific Monitoring",
+                    titleZh: "科学监测",
+                    cells: [
+                        {titleEn: "Seismological Networks", titleZh: "地震学网络", contentEn: "Dense arrays of seismometers continuously record underground tremors that often precede volcanic activity by days or weeks.", contentZh: "密集的地震仪阵列持续记录通常在火山活动前几天或几周发生的地下震动。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Ground Deformation Measurement", titleZh: "地面变形测量", contentEn: "GPS stations and satellite radar detect millimeter-scale surface changes indicating magma accumulation beneath the volcano.", contentZh: "GPS站和卫星雷达检测毫米级的地表变化，表明火山下方的岩浆积累。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Gas Emission Analysis", titleZh: "气体排放分析", contentEn: "Scientists monitor sulfur dioxide and carbon dioxide concentrations, as increased emissions suggest rising magma.", contentZh: "科学家监测二氧化硫和二氧化碳浓度，因为排放增加表明岩浆上升。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Expert Personnel", titleZh: "专家人员", contentEn: "Dedicated researchers like Dr. Ukawa and Dr. Valdés devote careers to understanding specific volcanic systems.", contentZh: "像宇川博士和巴尔德斯博士这样的专职研究人员将职业生涯奉献给理解特定的火山系统。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Scientific Monitoring", titleZh: "科学监测", contentEn: "Tracking activity", contentZh: "追踪活动", descEn: "Earthquake detection", descZh: "地震检测", cellClass: "subsun", fullContentEn: "Contemporary volcanology employs sophisticated instruments and methodologies to detect precursor signals that may indicate impending eruptions.", fullContentZh: "当代火山学采用复杂的仪器和方法来检测可能表明即将喷发的前兆信号。"},
+                        {titleEn: "Warning System Development", titleZh: "预警系统开发", contentEn: "Multi-parameter alert systems integrate various data sources to provide timely evacuation notifications to vulnerable populations.", contentZh: "多参数警报系统整合各种数据源，向易受影响的人口提供及时的疏散通知。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Activity Escalation Recognition", titleZh: "活动升级识别", contentEn: "Recent increases in seismic frequency near Mount Fuji have prompted heightened surveillance and public awareness campaigns.", contentZh: "富士山附近地震频率的近期增加促使加强监视和公众意识运动。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Technological Infrastructure", titleZh: "技术基础设施", contentEn: "Modern monitoring requires substantial investment in sensor networks, data transmission systems, and analytical software.", contentZh: "现代监测需要在传感器网络、数据传输系统和分析软件方面进行大量投资。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Behavioral Uniqueness", titleZh: "行为独特性", contentEn: "Each volcano exhibits distinctive patterns, preventing scientists from developing universal prediction models applicable to all systems.", contentZh: "每座火山都表现出独特的模式，使科学家无法开发适用于所有系统的通用预测模型。", descEn: "", descZh: "", cellClass: ""}
+                    ]
+                },
+                // SUBGRID 4: Popocatépetl Details
+                {
+                    titleEn: "Popocatépetl",
+                    titleZh: "波波卡特佩特火山",
+                    cells: [
+                        {titleEn: "Linguistic Heritage", titleZh: "语言遗产", contentEn: "The Náhuatl name 'smoking mountain' reflects indigenous observations of the volcano's perpetual gas emissions.", contentZh: "纳瓦特尔语名称'冒烟之山'反映了土著人对火山持续气体排放的观察。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Elevation Significance", titleZh: "海拔意义", contentEn: "As the world's tallest active volcano, Popocatépetl's height amplifies both its visual prominence and eruption hazards.", contentZh: "作为世界上最高的活火山，波波卡特佩特火山的高度放大了其视觉显著性和喷发危险。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Capital Proximity", titleZh: "首都邻近", contentEn: "Situated 70 kilometers from Mexico City, the volcano threatens one of the Western Hemisphere's largest urban centers.", contentZh: "波波火山位于距墨西哥城70公里处，威胁着西半球最大的城市中心之一。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Historical Timeline", titleZh: "历史时间线", contentEn: "The AD 820 eruption represents the last catastrophic event, though smaller eruptions occur with concerning regularity.", contentZh: "公元820年的喷发代表了最后一次灾难性事件，尽管较小的喷发以令人担忧的规律性发生。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Popocatépetl", titleZh: "波波卡特佩特火山", contentEn: "Mexico's smoking mountain", contentZh: "墨西哥的冒烟之山", descEn: "World's tallest active", descZh: "世界最高活火山", cellClass: "subsun", fullContentEn: "Popocatépetl maintains continuous volcanic activity, making it both a cultural landmark and an ever-present threat to millions of Mexican citizens.", fullContentZh: "波波卡特佩特火山保持持续的火山活动，使其既是文化地标，又是对数百万墨西哥公民的持续威胁。"},
+                        {titleEn: "Contemporary Events", titleZh: "当代事件", contentEn: "The year 2000 eruption necessitated evacuating 26,000 residents, demonstrating modern vulnerability despite technological advances.", contentZh: "2000年的喷发需要疏散26,000名居民，尽管技术进步，仍展示了现代脆弱性。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Inevitability Assessment", titleZh: "不可避免性评估", contentEn: "Volcanologists universally agree that major eruption recurrence is certain; uncertainty concerns only the timing.", contentZh: "火山学家普遍认为重大喷发的再次发生是确定的；不确定性仅涉及时间。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Visual Omnipresence", titleZh: "视觉无处不在", contentEn: "The volcano's constant visibility from Mexico City serves as a daily reminder of geological vulnerability.", contentZh: "从墨西哥城持续可见的火山作为地质脆弱性的日常提醒。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Population Vulnerability Scale", titleZh: "人口脆弱性规模", contentEn: "Twenty million people inhabit regions that could experience displacement, making El Popo one of Earth's most dangerous volcanoes.", contentZh: "2,000万人居住在可能经历流离失所的地区，使波波火山成为地球上最危险的火山之一。", descEn: "", descZh: "", cellClass: ""}
+                    ]
+                },
+                // SUBGRID 5: CENTER - The original L1 grid (VIOLENT EARTH + 8 planets)
+                {
+                    titleEn: "Sacred Summits (L1 Grid)",
+                    titleZh: "神圣高峰（L1网格）",
+                    cells: [
+                        {titleEn: "Mount Fuji", titleZh: "富士山", contentEn: "Japan's sacred mountain", contentZh: "日本的神圣山脉", descEn: "3,776m, last erupted 1707", descZh: "海拔3,776米，最后喷发于1707年", cellClass: ""},
+                        {titleEn: "Volcanic Threats", titleZh: "火山威胁", contentEn: "Dangers posed", contentZh: "构成的危险", descEn: "Ash, lava, displacement", descZh: "火山灰、熔岩、流离失所", cellClass: ""},
+                        {titleEn: "Scientific Monitoring", titleZh: "科学监测", contentEn: "Tracking activity", contentZh: "追踪活动", descEn: "Earthquake detection", descZh: "地震检测", cellClass: ""},
+                        {titleEn: "Popocatépetl", titleZh: "波波卡特佩特火山", contentEn: "Mexico's smoking mountain", contentZh: "墨西哥的冒烟之山", descEn: "World's tallest active", descZh: "世界最高活火山", cellClass: ""},
+                        {titleEn: "VIOLENT EARTH", titleZh: "暴烈地球", contentEn: "Sacred summits", contentZh: "神圣高峰", descEn: "Creators and destroyers", descZh: "创造者和毁灭者", cellClass: "subsun"},
+                        {titleEn: "Religious Significance", titleZh: "宗教意义", contentEn: "Spiritual meaning", contentZh: "精神意义", descEn: "Sacred holy sites", descZh: "神圣圣地", cellClass: ""},
+                        {titleEn: "Human Settlement", titleZh: "人类定居", contentEn: "Living near danger", contentZh: "居住在危险附近", descEn: "Rich volcanic soils", descZh: "富含火山土壤", cellClass: ""},
+                        {titleEn: "Cultural Practices", titleZh: "文化习俗", contentEn: "Honoring volcanoes", contentZh: "崇敬火山", descEn: "Ceremonies and rituals", descZh: "仪式和典礼", cellClass: ""},
+                        {titleEn: "Pacific Ring of Fire", titleZh: "环太平洋火山带", contentEn: "Volcanic zone", contentZh: "火山地带", descEn: "Tectonic plate boundaries", descZh: "构造板块边界", cellClass: ""}
+                    ]
+                },
+                // SUBGRID 6: Religious Significance
+                {
+                    titleEn: "Religious Significance",
+                    titleZh: "宗教意义",
+                    cells: [
+                        {titleEn: "Shinto Integration", titleZh: "神道教整合", contentEn: "Mount Fuji occupies a central position in Japanese indigenous religion, representing the manifestation of kami (divine spirits).", contentZh: "富士山在日本本土宗教中占据核心位置，代表着神灵（神圣精神）的体现。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Holy Site Designation", titleZh: "圣地指定", contentEn: "Religious authorities have consecrated these mountains as sacred spaces where ordinary rules of existence become suspended.", contentZh: "宗教当局已将这些山脉奉为神圣空间，在那里普通的存在规则被暂停。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Pilgrimage Traditions", titleZh: "朝圣传统", contentEn: "Believers undertake arduous journeys to volcanic summits, viewing physical hardship as necessary for spiritual advancement.", contentZh: "信徒进行艰苦的旅程到达火山山顶，将身体困难视为精神进步的必要条件。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Appeasement Rituals", titleZh: "安抚仪式", contentEn: "Communities present offerings to volcanic deities, attempting to negotiate protection from eruptions through ceremonial gifts.", contentZh: "社区向火山神灵呈献供品，试图通过仪式礼物协商免受喷发的保护。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Religious Significance", titleZh: "宗教意义", contentEn: "Spiritual meaning", contentZh: "精神意义", descEn: "Sacred holy sites", descZh: "神圣圣地", cellClass: "subsun", fullContentEn: "Volcanic mountains function as liminal spaces where human and divine realms intersect, serving as focal points for religious devotion and spiritual practice.", fullContentZh: "火山山脉作为人类和神圣领域交汇的边缘空间，作为宗教奉献和精神实践的焦点。"},
+                        {titleEn: "Generational Transmission", titleZh: "代际传承", contentEn: "Ancient beliefs persist through centuries as elders transmit religious knowledge and practices to younger generations.", contentZh: "古老的信仰通过长辈向年轻一代传递宗教知识和实践而持续数个世纪。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Protective Prayers", titleZh: "保护祈祷", contentEn: "Regular prayer cycles seek divine intervention to prevent catastrophic eruptions and maintain community safety.", contentZh: "定期的祈祷周期寻求神圣干预以防止灾难性喷发并维护社区安全。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Healing Mythology", titleZh: "治疗神话", contentEn: "Religious traditions attribute curative properties to volcanic waters, viewing the mountain as a source of physical restoration.", contentZh: "宗教传统将治疗特性归于火山水，将山脉视为身体恢复的来源。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Transformative Rites", titleZh: "转化仪式", contentEn: "Climbing expeditions serve as rites of passage marking transitions between life stages and social statuses.", contentZh: "登山探险作为标志生命阶段和社会地位之间转变的成人仪式。", descEn: "", descZh: "", cellClass: ""}
+                    ]
+                },
+                // SUBGRID 7: Human Settlement
+                {
+                    titleEn: "Human Settlement",
+                    titleZh: "人类定居",
+                    cells: [
+                        {titleEn: "Soil Composition Advantages", titleZh: "土壤成分优势", contentEn: "Decomposed volcanic material creates exceptionally nutrient-rich soils containing minerals essential for robust plant growth.", contentZh: "分解的火山物质创造了异常富含营养的土壤，包含对强健植物生长至关重要的矿物质。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Tropical Crop Production", titleZh: "热带作物生产", contentEn: "Central American volcanic regions support extensive banana plantations that form the economic foundation for entire communities.", contentZh: "中美洲火山地区支持广泛的香蕉种植园，构成整个社区的经济基础。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Premium Coffee Cultivation", titleZh: "优质咖啡种植", contentEn: "Mountain slopes provide ideal microclimates and soil conditions for producing internationally sought-after coffee varieties.", contentZh: "山坡提供理想的微气候和土壤条件，用于生产国际上备受追捧的咖啡品种。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Viticulture Excellence", titleZh: "葡萄栽培卓越", contentEn: "California's volcanic terroir contributes distinctive mineral characteristics to wines, commanding premium market prices.", contentZh: "加州的火山风土为葡萄酒贡献独特的矿物特征，获得高价市场价格。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Human Settlement", titleZh: "人类定居", contentEn: "Living near danger", contentZh: "居住在危险附近", descEn: "Rich volcanic soils", descZh: "富含火山土壤", cellClass: "subsun", fullContentEn: "Economic imperatives rooted in volcanic soil fertility compel human populations to maintain settlements despite catastrophic eruption risks.", fullContentZh: "植根于火山土壤肥力的经济必要性迫使人类群体尽管存在灾难性喷发风险仍维持定居点。"},
+                        {titleEn: "Staple Grain Systems", titleZh: "主粮系统", contentEn: "Indonesian rice production depends heavily on volcanic soil fertility, feeding millions across the archipelago.", contentZh: "印度尼西亚的水稻生产严重依赖火山土壤肥力，养活整个群岛的数百万人。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Ancestral Land Bonds", titleZh: "祖传土地纽带", contentEn: "Multigenerational family ownership creates profound emotional attachments that transcend rational risk assessment.", contentZh: "多代家庭所有权创造了超越理性风险评估的深刻情感依恋。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Demographic Pressure", titleZh: "人口压力", contentEn: "Continuing population growth in volcanic zones exponentially increases the number of people exposed to eruption hazards.", contentZh: "火山地区持续的人口增长呈指数级增加暴露于喷发危险的人数。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Immobility Factors", titleZh: "不动因素", contentEn: "Farmers lack alternative employment opportunities and financial resources necessary for relocation, effectively trapping them near volcanoes.", contentZh: "农民缺乏搬迁所需的替代就业机会和财政资源，有效地将他们困在火山附近。", descEn: "", descZh: "", cellClass: ""}
+                    ]
+                },
+                // SUBGRID 8: Cultural Practices
+                {
+                    titleEn: "Cultural Practices",
+                    titleZh: "文化习俗",
+                    cells: [
+                        {titleEn: "Dawn Ascent Tradition", titleZh: "黎明攀登传统", contentEn: "Pilgrims time their summit arrival to coincide with sunrise, viewing this moment as possessing special spiritual significance.", contentZh: "朝圣者安排他们的山顶到达时间与日出重合，将这一时刻视为具有特殊的精神意义。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Nocturnal Climbing Practice", titleZh: "夜间攀登实践", contentEn: "Night hiking allows participants to experience the mountain in darkness, intensifying the transformative nature of the journey.", contentZh: "夜间徒步旅行使参与者在黑暗中体验山脉，加强旅程的转化性质。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Ceremonial Gift-Giving", titleZh: "仪式献礼", contentEn: "Festival participants carry offerings to present at sacred sites, attempting to establish reciprocal relationships with volcanic deities.", contentZh: "节日参与者携带供品在神圣地点呈献，试图与火山神灵建立互惠关系。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Seasonal Ritual Cycles", titleZh: "季节仪式周期", contentEn: "Communities organize ceremonies according to agricultural calendars, aligning religious practice with planting and harvest periods.", contentZh: "社区根据农业日历组织仪式，将宗教实践与种植和收获时期对齐。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Cultural Practices", titleZh: "文化习俗", contentEn: "Honoring volcanoes", contentZh: "崇敬火山", descEn: "Ceremonies and rituals", descZh: "仪式和典礼", cellClass: "subsun", fullContentEn: "Traditional ceremonies performed at volcanic mountains represent accumulated cultural wisdom regarding human relationships with powerful geological forces.", fullContentZh: "在火山山脉进行的传统仪式代表了关于人类与强大地质力量关系的积累文化智慧。"},
+                        {titleEn: "Summit Dedication Practices", titleZh: "山顶奉献实践", contentEn: "Climbers transport ceremonial objects to high-altitude locations, demonstrating devotion through physical sacrifice.", contentZh: "登山者将仪式物品运送到高海拔地点，通过身体牺牲展示奉献。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Agricultural Petitions", titleZh: "农业请愿", contentEn: "Farmers perform rain-requesting ceremonies, seeking divine intervention to ensure adequate precipitation for crops.", contentZh: "农民进行祈雨仪式，寻求神圣干预以确保作物有足够的降水。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Harvest Protection Rituals", titleZh: "丰收保护仪式", contentEn: "Annual ceremonies request volcanic deities to refrain from erupting during critical growing seasons.", contentZh: "年度仪式请求火山神灵在关键生长季节避免喷发。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Cosmological Framework", titleZh: "宇宙学框架", contentEn: "Traditional worldviews conceptualize volcanoes as simultaneously divine entities, physical landscapes, and extensions of human identity.", contentZh: "传统世界观将火山概念化为同时是神圣实体、物理景观和人类身份的延伸。", descEn: "", descZh: "", cellClass: ""}
+                    ]
+                },
+                // SUBGRID 9: Pacific Ring of Fire
+                {
+                    titleEn: "Pacific Ring of Fire",
+                    titleZh: "环太平洋火山带",
+                    cells: [
+                        {titleEn: "Geometric Configuration", titleZh: "几何配置", contentEn: "The Ring forms a 40,000-kilometer horseshoe-shaped arc encircling the Pacific Ocean basin across multiple continents.", contentZh: "火山带形成一个40,000公里的马蹄形弧，跨越多个大陆环绕太平洋盆地。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Plate Boundary Dynamics", titleZh: "板块边界动力学", contentEn: "Multiple tectonic plates converge, diverge, and slide past one another, creating zones of intense geological instability.", contentZh: "多个构造板块汇聚、分离和相互滑动，创造强烈地质不稳定的区域。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Seismic Concentration", titleZh: "地震集中", contentEn: "Approximately 90% of Earth's earthquakes occur within this zone, making it the planet's primary source of seismic activity.", contentZh: "地球约90%的地震发生在这个区域内，使其成为地球地震活动的主要来源。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Volcanic Prevalence", titleZh: "火山普遍性", contentEn: "The Ring contains roughly 75% of the world's active volcanoes, demonstrating the connection between plate tectonics and volcanism.", contentZh: "火山带包含世界约75%的活火山，展示了板块构造与火山作用之间的联系。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Pacific Ring of Fire", titleZh: "环太平洋火山带", contentEn: "Volcanic zone", contentZh: "火山地带", descEn: "Tectonic plate boundaries", descZh: "构造板块边界", cellClass: "subsun", fullContentEn: "The Pacific Ring of Fire represents Earth's most geologically active zone, where converging tectonic plates generate the majority of worldwide seismic and volcanic phenomena.", fullContentZh: "环太平洋火山带代表地球上地质最活跃的区域，汇聚的构造板块在此产生全球大部分地震和火山现象。"},
+                        {titleEn: "Subduction Zone Mechanics", titleZh: "俯冲带力学", contentEn: "Oceanic plates descending beneath continental plates generate magma through pressure and heat, fueling volcanic eruptions.", contentZh: "海洋板块在大陆板块下方下降通过压力和热量产生岩浆，推动火山喷发。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Atmospheric Impact Potential", titleZh: "大气影响潜力", contentEn: "Major Ring of Fire eruptions can inject massive quantities of particles into the stratosphere, affecting global climate patterns.", contentZh: "环太平洋火山带的重大喷发可以向平流层注入大量颗粒，影响全球气候模式。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "Designated High-Risk Sites", titleZh: "指定高风险地点", contentEn: "Scientists identify sixteen 'Decade Volcanoes' representing the most dangerous systems requiring intensive monitoring.", contentZh: "科学家确定了16座'十年火山'，代表需要密集监测的最危险系统。", descEn: "", descZh: "", cellClass: ""},
+                        {titleEn: "International Implications", titleZh: "国际影响", contentEn: "The Ring spans multiple nations across Asia, the Americas, and Oceania, necessitating coordinated international disaster preparedness efforts.", contentZh: "火山带跨越亚洲、美洲和大洋洲的多个国家，需要协调的国际灾害准备工作。", descEn: "", descZh: "", cellClass: ""}
+                    ]
+                }
+            ]
+        };
+
+        let currentLevel = 1;
+        let selectedSubgrid = null;
+        let globalFlipped = false;
+        let isFullscreen = false;
+        let frontLang = 'en';
+
+        function createCell(cellData, useFullContent = false, position = null) {
+            const container = document.createElement('div');
+            container.className = 'cell-container';
+            
+            const flipper = document.createElement('div');
+            flipper.className = 'cell-flipper';
+            flipper.addEventListener('click', function(e) {
+                // Don't flip if clicking on media buttons
+                if (e.target.closest('.media-btn') || e.target.closest('.media-player')) {
+                    e.stopPropagation();
+                    return;
+                }
+                e.stopPropagation();
+                container.classList.toggle('flipped');
+            });
+            
+            // Front is ALWAYS English, Back is ALWAYS Chinese
+            const frontContentToUse = useFullContent && cellData.fullContentEn ? cellData.fullContentEn : cellData.contentEn;
+            const backContentToUse = useFullContent && cellData.fullContentZh ? cellData.fullContentZh : cellData.contentZh;
+            
+            const frontTitle = cellData.titleEn;
+            const frontContent = frontContentToUse;
+            const frontDesc = cellData.descEn;
+            
+            const backTitle = cellData.titleZh;
+            const backContent = backContentToUse;
+            const backDesc = cellData.descZh;
+            
+            const posClass = position ? `pos-${position}` : '';
+            
+            const front = document.createElement('div');
+            front.className = `cell front ${cellData.cellClass} ${posClass}`.trim();
+            
+            // Build front HTML with multimedia support
+            let frontHTML = '';
+            
+            // Add image if present
+            if (cellData.image) {
+                frontHTML += `<img src="${cellData.image}" alt="${cellData.imageAlt || frontTitle}" class="cell-image">`;
+            }
+            
+            frontHTML += `<div class="cell-title">${frontTitle}</div>`;
+            frontHTML += `<div class="cell-content">${frontContent}</div>`;
+            
+            if (!useFullContent && frontDesc) {
+                frontHTML += `<div class="cell-content" style="margin-top: 8px; font-size: 0.85em; font-style: italic;">${frontDesc}</div>`;
+            }
+            
+            // Add multimedia controls if present
+            if (cellData.audioUrl || cellData.videoUrl) {
+                frontHTML += '<div class="media-controls">';
+                
+                if (cellData.audioUrl) {
+                    const audioId = 'audio-' + Math.random().toString(36).substr(2, 9);
+                    const audioSize = cellData.audioSize ? `<span class="media-size">(${cellData.audioSize})</span>` : '';
+                    frontHTML += `
+                        <div class="media-item">
+                            <span class="media-icon">🎧</span>
+                            <span class="media-title">${cellData.audioTitle || 'Audio'}</span>
+                            <button class="media-btn" onclick="toggleAudio('${audioId}'); event.stopPropagation();">▶️ Play</button>
+                            <a href="${cellData.audioUrl}" download class="media-btn" onclick="event.stopPropagation();">⬇️</a>
+                            ${audioSize}
+                        </div>
+                        <div id="${audioId}" class="media-player">
+                            <audio controls>
+                                <source src="${cellData.audioUrl}" type="audio/mpeg">
+                                Your browser does not support audio playback.
+                            </audio>
+                        </div>
+                    `;
+                }
+                
+                if (cellData.videoUrl) {
+                    const videoId = 'video-' + Math.random().toString(36).substr(2, 9);
+                    const videoSize = cellData.videoSize ? `<span class="media-size">(${cellData.videoSize})</span>` : '';
+                    frontHTML += `
+                        <div class="media-item">
+                            <span class="media-icon">🎬</span>
+                            <span class="media-title">${cellData.videoTitle || 'Video'}</span>
+                            <button class="media-btn" onclick="toggleVideo('${videoId}'); event.stopPropagation();">▶️ Play</button>
+                            <a href="${cellData.videoUrl}" download class="media-btn" onclick="event.stopPropagation();">⬇️</a>
+                            ${videoSize}
+                        </div>
+                        <div id="${videoId}" class="media-player">
+                            <video controls ${cellData.videoPoster ? `poster="${cellData.videoPoster}"` : ''}>
+                                <source src="${cellData.videoUrl}" type="video/mp4">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                    `;
+                }
+                
+                frontHTML += '</div>';
+            }
+            
+            frontHTML += `<div class="flip-indicator">🔄</div>`;
+            front.innerHTML = frontHTML;
+            
+            // Build back (Chinese) side - similar structure
+            const back = document.createElement('div');
+            back.className = `cell back ${cellData.cellClass} ${posClass}`.trim();
+            
+            let backHTML = '';
+            
+            // Add image if present (same image on both sides)
+            if (cellData.image) {
+                backHTML += `<img src="${cellData.image}" alt="${cellData.imageAlt || backTitle}" class="cell-image">`;
+            }
+            
+            backHTML += `<div class="cell-title">${backTitle}</div>`;
+            backHTML += `<div class="cell-content">${backContent}</div>`;
+            
+            if (!useFullContent && backDesc) {
+                backHTML += `<div class="cell-content" style="margin-top: 8px; font-size: 0.85em; font-style: italic;">${backDesc}</div>`;
+            }
+            
+            // Add same multimedia controls on back
+            if (cellData.audioUrl || cellData.videoUrl) {
+                backHTML += '<div class="media-controls">';
+                
+                if (cellData.audioUrl) {
+                    const audioId = 'audio-back-' + Math.random().toString(36).substr(2, 9);
+                    const audioSize = cellData.audioSize ? `<span class="media-size">(${cellData.audioSize})</span>` : '';
+                    backHTML += `
+                        <div class="media-item">
+                            <span class="media-icon">🎧</span>
+                            <span class="media-title">${cellData.audioTitle || '音频'}</span>
+                            <button class="media-btn" onclick="toggleAudio('${audioId}'); event.stopPropagation();">▶️ 播放</button>
+                            <a href="${cellData.audioUrl}" download class="media-btn" onclick="event.stopPropagation();">⬇️</a>
+                            ${audioSize}
+                        </div>
+                        <div id="${audioId}" class="media-player">
+                            <audio controls>
+                                <source src="${cellData.audioUrl}" type="audio/mpeg">
+                                您的浏览器不支持音频播放。
+                            </audio>
+                        </div>
+                    `;
+                }
+                
+                if (cellData.videoUrl) {
+                    const videoId = 'video-back-' + Math.random().toString(36).substr(2, 9);
+                    const videoSize = cellData.videoSize ? `<span class="media-size">(${cellData.videoSize})</span>` : '';
+                    backHTML += `
+                        <div class="media-item">
+                            <span class="media-icon">🎬</span>
+                            <span class="media-title">${cellData.videoTitle || '视频'}</span>
+                            <button class="media-btn" onclick="toggleVideo('${videoId}'); event.stopPropagation();">▶️ 播放</button>
+                            <a href="${cellData.videoUrl}" download class="media-btn" onclick="event.stopPropagation();">⬇️</a>
+                            ${videoSize}
+                        </div>
+                        <div id="${videoId}" class="media-player">
+                            <video controls ${cellData.videoPoster ? `poster="${cellData.videoPoster}"` : ''}>
+                                <source src="${cellData.videoUrl}" type="video/mp4">
+                                您的浏览器不支持视频播放。
+                            </video>
+                        </div>
+                    `;
+                }
+                
+                backHTML += '</div>';
+            }
+            
+            backHTML += `<div class="flip-indicator">🔄</div>`;
+            back.innerHTML = backHTML;
+            
+            flipper.appendChild(front);
+            flipper.appendChild(back);
+            container.appendChild(flipper);
+            
+            return container;
+        }
+
+        // Media player toggle functions
+        function toggleAudio(audioId) {
+            const player = document.getElementById(audioId);
+            if (player) {
+                player.classList.toggle('active');
+                const audio = player.querySelector('audio');
+                if (player.classList.contains('active')) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                }
+            }
+        }
+
+        function toggleVideo(videoId) {
+            const player = document.getElementById(videoId);
+            if (player) {
+                player.classList.toggle('active');
+                const video = player.querySelector('video');
+                if (player.classList.contains('active')) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            }
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            grid.className = 'grid level-' + currentLevel;
+            
+            if (currentLevel === 0) {
+                contentData.L0.forEach(cellData => {
+                    const cell = createCell(cellData, false);
+                    grid.appendChild(cell);
+                });
+            } else if (currentLevel === 1) {
+                contentData.L1.forEach((cellData, index) => {
+                    const cell = createCell(cellData, false, index + 1);
+                    grid.appendChild(cell);
+                });
+            } else if (currentLevel === 2 && selectedSubgrid === null) {
+                contentData.L2.forEach((subgridData, subgridIndex) => {
+                    const subgridDiv = document.createElement('div');
+                    subgridDiv.className = 'subgrid';
+                    
+                    subgridData.cells.forEach((cellData, cellIndex) => {
+                        // Create simplified cell for L2 overview - title only
+                        const container = document.createElement('div');
+                        container.className = 'cell-container';
+                        
+                        const flipper = document.createElement('div');
+                        flipper.className = 'cell-flipper';
+                        
+                        const frontTitle = cellData.titleEn;
+                        const backTitle = cellData.titleZh;
+                        
+                        const front = document.createElement('div');
+                        // For subsuns (center cells), use the subgrid's position to maintain color from L1
+                        // For central 3x3 grid (subgridIndex === 4), assign position classes to all cells
+                        let posClass = '';
+                        if (cellData.cellClass === 'subsun') {
+                            posClass = `pos-${subgridIndex + 1}`;
+                        } else if (subgridIndex === 4) {
+                            // Central 3x3 grid - assign position classes to match L1
+                            posClass = `pos-${cellIndex + 1}`;
+                        }
+                        front.className = `cell front ${cellData.cellClass} ${posClass}`.trim();
+                        front.innerHTML = `<div class="cell-title">${frontTitle}</div>`;
+                        
+                        const back = document.createElement('div');
+                        back.className = `cell back ${cellData.cellClass} ${posClass}`.trim();
+                        back.innerHTML = `<div class="cell-title">${backTitle}</div>`;
+                        
+                        flipper.appendChild(front);
+                        flipper.appendChild(back);
+                        container.appendChild(flipper);
+                        
+                        subgridDiv.appendChild(container);
+                    });
+                    
+                    // Add overlay AFTER cells so it covers them properly
+                    const overlay = document.createElement('div');
+                    overlay.className = 'subgrid-overlay';
+                    // Use IIFE to properly capture the index in the closure
+                    overlay.addEventListener('click', ((idx) => {
+                        return () => zoomToSubgrid(idx);
+                    })(subgridIndex));
+                    subgridDiv.appendChild(overlay);
+                    
+                    grid.appendChild(subgridDiv);
+                });
+            } else if (currentLevel === 2 && selectedSubgrid !== null) {
+                grid.className = 'grid level-2-5';
+                const subgridData = contentData.L2[selectedSubgrid];
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'subgrid-title';
+                titleDiv.textContent = frontLang === 'en' ? subgridData.titleEn : subgridData.titleZh;
+                grid.appendChild(titleDiv);
+                
+                subgridData.cells.forEach((cellData, cellIndex) => {
+                    // For subsuns, use the subgrid's position to maintain color from L1
+                    const position = cellData.cellClass === 'subsun' ? selectedSubgrid + 1 : null;
+                    const cell = createCell(cellData, true, position); // Use FULL content for L2.5 zoomed view
+                    grid.appendChild(cell);
+                });
+            }
+            
+            updateControls();
+        }
+
+        function updateControls() {
+            document.getElementById('zoomIn').disabled = (currentLevel === 0);
+            document.getElementById('zoomOut').disabled = (currentLevel === 2);
+            
+            document.getElementById('backBtn').style.display = 
+                (currentLevel === 2 && selectedSubgrid !== null) ? 'block' : 'none';
+            
+            const labels = [
+                'Level 0: Core Concept - Violent Earth',
+                'Level 1: Sacred Summits Overview',
+                'Level 2: Detailed View (9 Topics)'
+            ];
+            
+            if (currentLevel === 2 && selectedSubgrid !== null) {
+                const subgridTitle = frontLang === 'en' 
+                    ? contentData.L2[selectedSubgrid].titleEn 
+                    : contentData.L2[selectedSubgrid].titleZh;
+                document.getElementById('levelIndicator').textContent = 'Level 2.5: ' + subgridTitle;
+            } else {
+                document.getElementById('levelIndicator').textContent = labels[currentLevel];
+            }
+        }
+
+        function zoomToSubgrid(index) {
+            console.log('Zooming to subgrid index:', index);
+            console.log('Subgrid title:', contentData.L2[index].titleEn);
+            selectedSubgrid = index;
+            renderGrid();
+        }
+
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            if (currentLevel > 0) {
+                currentLevel--;
+                selectedSubgrid = null;
+                renderGrid();
+            }
+        });
+
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            if (currentLevel < 2) {
+                currentLevel++;
+                selectedSubgrid = null;
+                renderGrid();
+            }
+        });
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            selectedSubgrid = null;
+            renderGrid();
+        });
+
+        document.getElementById('flipAll').addEventListener('click', () => {
+            globalFlipped = !globalFlipped;
+            document.getElementById('gridContainer').classList.toggle('global-flip');
+            document.getElementById('flipAll').textContent = globalFlipped ? 'Flip Back 🔄' : 'Flip All 🔄';
+        });
+
+        document.getElementById('langToggle').addEventListener('click', () => {
+            frontLang = frontLang === 'en' ? 'zh' : 'en';
+            document.getElementById('langToggle').textContent = 
+                frontLang === 'en' ? 'UI Language: EN 🌐' : 'UI Language: 中文 🌐';
+            
+            renderGrid();
+        });
+
+        document.getElementById('fullscreen').addEventListener('click', () => {
+            isFullscreen = !isFullscreen;
+            document.body.classList.toggle('fullscreen-mode');
+            document.getElementById('fullscreen').textContent = isFullscreen ? 'Exit ✕' : 'Presentation Mode 🖥️';
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'f' || e.key === 'F') {
+                document.getElementById('fullscreen').click();
+            } else if (e.key === 'Escape' && isFullscreen) {
+                document.getElementById('fullscreen').click();
+            } else if (e.key === 'l' || e.key === 'L') {
+                document.getElementById('langToggle').click();
+            }
+        });
+
+        renderGrid();
+    </script>
+</body>
+</html>

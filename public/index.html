@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Grids Library</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-style: italic;
+        }
+
+        .stats {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .stats strong {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .grid-library {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .grid-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .grid-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .grid-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .grid-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .grid-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .grid-card .launch-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .grid-card:hover .launch-btn {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .empty-state h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .empty-state p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .empty-state code {
+            background: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+        }
+
+        .instructions {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 40px;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 2;
+            color: #555;
+        }
+
+        .instructions code {
+            background: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .grid-library {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📐 Fractal Grids Library</h1>
+            <p>Interactive Educational Visualizations</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <strong id="gridCount">-</strong>
+            <span>Available Fractal Grids</span>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="/builder" style="display: inline-block; padding: 15px 30px; background: white; color: #667eea; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                🎨 Create New Grid
+            </a>
+            <a href="/media-manager" style="display: inline-block; padding: 15px 30px; background: white; color: #f5576c; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                📎 Add Media to Existing Grid
+            </a>
+        </div>
+
+        <div id="gridLibrary" class="grid-library">
+            <div class="loading">Loading grids...</div>
+        </div>
+
+        <div class="instructions">
+            <h3>📚 How to Add New Grids</h3>
+            <ol>
+                <li>Create your fractal grid HTML file (following the template)</li>
+                <li>Save it in the <code>grids/</code> folder with a descriptive name (e.g., <code>climate-action.html</code>)</li>
+                <li>Refresh this page - your new grid will appear automatically!</li>
+                <li>Share the URL with students: <code>http://[your-ip]:3000/grid/[grid-name]</code></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display all available grids
+        async function loadGrids() {
+            try {
+                const response = await fetch('/api/grids');
+                const grids = await response.json();
+                
+                const gridLibrary = document.getElementById('gridLibrary');
+                const gridCount = document.getElementById('gridCount');
+                
+                gridCount.textContent = grids.length;
+                
+                if (grids.length === 0) {
+                    gridLibrary.innerHTML = `
+                        <div class="empty-state">
+                            <h2>No Grids Found</h2>
+                            <p>Get started by adding your first fractal grid!</p>
+                            <p>Place your HTML files in the <code>grids/</code> folder.</p>
+                            <p>Example: <code>grids/violent-earth-sacred-summits.html</code></p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                gridLibrary.innerHTML = grids.map(grid => `
+                    <a href="${grid.url}" class="grid-card">
+                        <h2>${escapeHtml(grid.title)}</h2>
+                        <p>${grid.description || 'An interactive 9×9 fractal grid visualization with bilingual content and multi-level zoom.'}</p>
+                        <div class="meta">
+                            <span>🔗 ${grid.id}</span>
+                            <button class="launch-btn">Launch Grid →</button>
+                        </div>
+                    </a>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading grids:', error);
+                document.getElementById('gridLibrary').innerHTML = `
+                    <div class="empty-state">
+                        <h2>Error Loading Grids</h2>
+                        <p>Unable to connect to the server. Please make sure the server is running.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load grids on page load
+        loadGrids();
+    </script>
+</body>
+</html>

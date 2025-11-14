@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Manager - Add Media to Existing Grids</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .panel h2 {
+            color: #f5576c;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid #f5576c;
+            padding-bottom: 10px;
+        }
+
+        .step-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #f5576c;
+        }
+
+        .step-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #f5576c;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .grid-selector {
+            margin-bottom: 20px;
+        }
+
+        .grid-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .grid-selector select:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+
+        .cell-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .cell-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cell-card:hover {
+            border-color: #f5576c;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .cell-card.selected {
+            border-color: #f5576c;
+            background: #fff5f7;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+
+        .cell-card.center {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffe5e9 100%);
+        }
+
+        .cell-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f5576c;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .cell-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            padding-right: 30px;
+        }
+
+        .cell-content {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .media-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-image {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-audio {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-video {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .badge-none {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .upload-section {
+            display: none;
+            margin-top: 20px;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #f5576c;
+        }
+
+        .upload-section.active {
+            display: block;
+        }
+
+        .upload-section h3 {
+            color: #f5576c;
+            margin-bottom: 20px;
+        }
+
+        .upload-group {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .upload-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .file-drop-zone {
+            border: 3px dashed #f5576c;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .file-drop-zone:hover {
+            background: #fff5f7;
+            border-color: #d4485a;
+        }
+
+        .file-drop-zone.dragover {
+            background: #fff5f7;
+            border-color: #d4485a;
+            transform: scale(1.02);
+        }
+
+        .file-drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .drop-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .drop-text {
+            font-size: 1.1rem;
+            color: #f5576c;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .drop-hint {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .file-info.active {
+            display: block;
+        }
+
+        .file-info-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-preview-img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 5px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .code-output {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-left: 4px solid #1976d2;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            color: #e65100;
+            border-left: 4px solid #ff9800;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        .instructions code {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        @media (max-width: 768px) {
+            .cell-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📎 Media Manager</h1>
+            <p>Add images, audio, and video to existing fractal grids</p>
+        </div>
+
+        <div class="alert alert-info">
+            <span style="font-size: 1.5rem;">🚀</span>
+            <div>
+                <strong>NEW: Auto-Update!</strong> Select your grid → Choose a cell → Upload media → Click "Auto-Update" → Done! No manual pasting required!
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Step 1: Select Your Grid</h2>
+            <div class="grid-selector">
+                <select id="gridSelector" onchange="loadGrid(this.value)">
+                    <option value="">-- Choose a grid to edit --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="panel" id="cellPanel" style="display: none;">
+            <h2>Step 2: Select Cell to Add Media</h2>
+            <div class="alert alert-warning">
+                <span style="font-size: 1.5rem;">⚠️</span>
+                <div>Click on any cell below to add or update its multimedia content</div>
+            </div>
+            <div class="cell-grid" id="cellGrid">
+                <!-- Cells will be loaded here -->
+            </div>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <h3>Step 3: Upload Media for Selected Cell</h3>
+            <div id="selectedCellInfo" style="margin-bottom: 20px; padding: 15px; background: #fff5f7; border-radius: 8px;">
+                <!-- Selected cell info will appear here -->
+            </div>
+            
+            <div class="alert" style="background: #e7f3ff; border: 1px solid #2196F3; color: #0d47a1; margin-bottom: 20px; padding: 12px; border-radius: 8px;">
+                <span style="font-size: 1.5rem;">💡</span>
+                <div>
+                    <strong>You can upload multiple media types to the same cell!</strong><br>
+                    Add an image, audio, AND video all together. Your media folders are at:<br>
+                    <code style="font-size: 0.85em; background: white; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 5px;">
+                        ~/CascadeProjects/fractal-grids/grids/images/ | audio/ | videos/
+                    </code>
+                </div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="upload-group">
+                <label>📷 Upload Image</label>
+                <div class="file-drop-zone" id="imageDropZone" onclick="document.getElementById('imageInput').click()">
+                    <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+                    <div class="drop-icon">🖼️</div>
+                    <div class="drop-text">Click or drag image here</div>
+                    <div class="drop-hint">JPG, PNG, WebP, SVG (max 5MB)</div>
+                </div>
+                <div class="file-info" id="imageInfo"></div>
+            </div>
+
+            <!-- Audio Upload -->
+            <div class="upload-group">
+                <label>🎧 Upload Audio/Podcast</label>
+                <div class="file-drop-zone" id="audioDropZone" onclick="document.getElementById('audioInput').click()">
+                    <input type="file" id="audioInput" accept="audio/*" onchange="handleAudioUpload(event)">
+                    <div class="drop-icon">🎵</div>
+                    <div class="drop-text">Click or drag audio here</div>
+                    <div class="drop-hint">MP3, M4A, OGG (max 50MB)</div>
+                </div>
+                <div class="file-info" id="audioInfo"></div>
+            </div>
+
+            <!-- Video Upload -->
+            <div class="upload-group">
+                <label>🎬 Upload Video</label>
+                <div class="file-drop-zone" id="videoDropZone" onclick="document.getElementById('videoInput').click()">
+                    <input type="file" id="videoInput" accept="video/*" onchange="handleVideoUpload(event)">
+                    <div class="drop-icon">🎥</div>
+                    <div class="drop-text">Click or drag video here</div>
+                    <div class="drop-hint">MP4, WebM (max 200MB)</div>
+                </div>
+                <div class="file-info" id="videoInfo"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="autoUpdateGrid()" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);">
+                    🚀 Auto-Update Grid (Recommended!)
+                </button>
+                <button class="btn btn-primary" onclick="generateCode()">📋 Show Code (Manual)</button>
+                <button class="btn btn-secondary" onclick="clearUploads()">🔄 Clear All</button>
+            </div>
+        </div>
+
+        <div class="panel" id="successPanel" style="display: none;">
+            <h2>✅ Success! Grid Updated</h2>
+            <div class="alert alert-success">
+                <span style="font-size: 2rem;">🎉</span>
+                <div>
+                    <strong>Your grid has been automatically updated!</strong><br>
+                    Media files saved and cell data updated. Refresh your grid to see the changes.
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>What happened:</h3>
+                <ol>
+                    <li>✅ Media files saved to correct folders</li>
+                    <li>✅ Cell data automatically updated in HTML file</li>
+                    <li>✅ Backup created (in case you need to undo)</li>
+                    <li>✅ Ready to view immediately!</li>
+                </ol>
+                <h3>Next steps:</h3>
+                <ol>
+                    <li>Refresh your grid in the browser</li>
+                    <li>Click on <strong id="updatedCellName"></strong> to see the new media</li>
+                    <li>Test play/download buttons</li>
+                </ol>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="window.open('/grid/' + currentGrid, '_blank')">🔍 View Updated Grid</button>
+                <button class="btn btn-secondary" onclick="startOver()">➕ Add Media to Another Cell</button>
+            </div>
+        </div>
+
+        <div class="panel" id="codePanel" style="display: none;">
+            <h2>Step 4: Copy & Paste Code (Manual Method)</h2>
+            <div class="alert alert-success">
+                <span style="font-size: 1.5rem;">✅</span>
+                <div>
+                    <strong>Code generated!</strong> Copy and paste it into your grid's cell data
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>How to add this to your grid:</h3>
+                <ol>
+                    <li>Copy the code below (click the code box to select all)</li>
+                    <li>Open your grid HTML file in a text editor</li>
+                    <li>Find the cell data for <strong id="targetCellName"></strong></li>
+                    <li>Add these lines inside the cell's data object</li>
+                    <li>Save your media files to the appropriate folders:
+                        <ul>
+                            <li><code>grids/images/</code> for images</li>
+                            <li><code>grids/audio/</code> for audio</li>
+                            <li><code>grids/videos/</code> for videos</li>
+                        </ul>
+                    </li>
+                    <li>Refresh your grid to see the changes!</li>
+                </ol>
+            </div>
+
+            <div class="code-output" id="codeOutput" onclick="selectCode()">
+                <!-- Generated code will appear here -->
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyCode()">📋 Copy Code</button>
+                <button class="btn btn-secondary" onclick="startOver()">🔄 Add Media to Another Cell</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGrid = null;
+        let currentCell = null;
+        let uploadedMedia = {
+            image: null,
+            audio: null,
+            video: null
+        };
+
+        // Load available grids
+        async function loadGrids() {
+            try {
+                const response = await fetch('/api/grids');
+                const grids = await response.json();
+                
+                const selector = document.getElementById('gridSelector');
+                grids.forEach(grid => {
+                    const option = document.createElement('option');
+                    option.value = grid.id;
+                    option.textContent = grid.title;
+                    selector.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading grids:', error);
+            }
+        }
+
+        // Load grid and display cells
+        async function loadGrid(gridId) {
+            if (!gridId) return;
+            
+            currentGrid = gridId;
+            
+            const cellPanel = document.getElementById('cellPanel');
+            const cellGrid = document.getElementById('cellGrid');
+            
+            cellGrid.innerHTML = '<div style="text-align: center; padding: 20px;">Loading grid data...</div>';
+            
+            try {
+                // Fetch grid content to check for existing media
+                const response = await fetch(`/api/grid-content/${gridId}`);
+                const data = await response.json();
+                
+                // Parse L1 cells from content
+                const l1Match = data.content.match(/L1:\s*\[([\s\S]*?)\],\s*L2:/);
+                let cellsData = [];
+                
+                if (l1Match) {
+                    const l1Content = l1Match[1];
+                    // Parse cells using brace counting
+                    let braceCount = 0;
+                    let currentCell = '';
+                    let inCell = false;
+                    
+                    for (let i = 0; i < l1Content.length; i++) {
+                        const char = l1Content[i];
+                        
+                        if (char === '{') {
+                            if (braceCount === 0) {
+                                inCell = true;
+                                currentCell = '';
+                            }
+                            braceCount++;
+                        }
+                        
+                        if (inCell) {
+                            currentCell += char;
+                        }
+                        
+                        if (char === '}') {
+                            braceCount--;
+                            if (braceCount === 0 && inCell) {
+                                // Check for media in this cell
+                                const hasImage = /image:\s*"/.test(currentCell);
+                                const hasAudio = /audioUrl:\s*"/.test(currentCell);
+                                const hasVideo = /videoUrl:\s*"/.test(currentCell);
+                                cellsData.push({ hasImage, hasAudio, hasVideo });
+                                inCell = false;
+                            }
+                        }
+                    }
+                }
+                
+                cellGrid.innerHTML = '';
+                
+                // Create 9 cells (3x3 grid)
+                // Cell numbering: 1-4 (top/left), 0 (center sun), 5-8 (right/bottom)
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell-card';
+                    if (i === 4) cell.classList.add('center');
+                    
+                    const position = ['Top-Left', 'Top-Center', 'Top-Right', 
+                                     'Middle-Left', 'Center', 'Middle-Right',
+                                     'Bottom-Left', 'Bottom-Center', 'Bottom-Right'][i];
+                    
+                    // Cell numbering: 0 for center (sun), 1-8 for planets
+                    // i=0→1, i=1→2, i=2→3, i=3→4, i=4→0, i=5→5, i=6→6, i=7→7, i=8→8
+                    const cellNumber = i === 4 ? 0 : (i < 4 ? i + 1 : i);
+                    
+                    // Build media badges
+                    let badges = '';
+                    const cellData = cellsData[i] || {};
+                    
+                    if (cellData.hasImage) badges += '<span class="badge badge-image">📷 Image</span>';
+                    if (cellData.hasAudio) badges += '<span class="badge badge-audio">🎧 Audio</span>';
+                    if (cellData.hasVideo) badges += '<span class="badge badge-video">🎬 Video</span>';
+                    if (!badges) badges = '<span class="badge badge-none">No media</span>';
+                    
+                    cell.innerHTML = `
+                        <div class="cell-number">${cellNumber}</div>
+                        <div class="cell-title">${position}</div>
+                        <div class="cell-content">Click to add/update media</div>
+                        <div class="media-badges">
+                            ${badges}
+                        </div>
+                    `;
+                    
+                    cell.onclick = () => selectCell(i, position, cellNumber);
+                    cellGrid.appendChild(cell);
+                }
+                
+                cellPanel.style.display = 'block';
+            } catch (error) {
+                console.error('Error loading grid:', error);
+                cellGrid.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Error loading grid data</div>';
+            }
+        }
+
+        // Select a cell to edit
+        function selectCell(index, position, cellNumber) {
+            currentCell = { index, position, cellNumber };
+            
+            // Highlight selected cell
+            document.querySelectorAll('.cell-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.cell-card')[index].classList.add('selected');
+            
+            // Show upload section
+            const uploadSection = document.getElementById('uploadSection');
+            uploadSection.classList.add('active');
+            
+            // Update selected cell info
+            const cellLabel = cellNumber === 0 ? 'Cell 0 (Sun)' : `Cell ${cellNumber}`;
+            document.getElementById('selectedCellInfo').innerHTML = `
+                <strong>Selected Cell:</strong> ${cellLabel} - ${position}<br>
+                <small>Upload media files below. Files will be prefixed with "Cell${cellNumber}-" for easy identification.</small>
+            `;
+            
+            // Scroll to upload section
+            uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Handle image upload
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('⚠️ Image file is too large! Please keep under 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedMedia.image = {
+                    filename: file.name,
+                    size: (file.size / 1024).toFixed(1) + ' KB',
+                    data: e.target.result
+                };
+                
+                const info = document.getElementById('imageInfo');
+                info.innerHTML = `
+                    <div class="file-info-content">
+                        <img src="${e.target.result}" class="file-preview-img" alt="Preview">
+                        <div>
+                            <strong>✅ ${file.name}</strong><br>
+                            <small>${uploadedMedia.image.size}</small>
+                        </div>
+                    </div>
+                `;
+                info.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle audio upload
+        function handleAudioUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            console.log('🎧 Audio file selected:', file.name, file.size, 'bytes');
+            
+            if (file.size > 50 * 1024 * 1024) {
+                alert('⚠️ Audio file is too large! Please keep under 50MB.');
+                return;
+            }
+            
+            const info = document.getElementById('audioInfo');
+            info.innerHTML = '<div style="text-align: center; padding: 10px;">⏳ Loading audio file...</div>';
+            info.classList.add('active');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedMedia.audio = {
+                    filename: file.name,
+                    size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
+                    data: e.target.result
+                };
+                
+                console.log('✅ Audio file loaded into memory');
+                
+                info.innerHTML = `
+                    <div class="file-info-content">
+                        <span style="font-size: 2rem;">🎧</span>
+                        <div>
+                            <strong>✅ ${file.name}</strong><br>
+                            <small>${uploadedMedia.audio.size}</small>
+                        </div>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle video upload
+        function handleVideoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            console.log('🎬 Video file selected:', file.name, file.size, 'bytes');
+            
+            if (file.size > 200 * 1024 * 1024) {
+                alert('⚠️ Video file is too large! Please keep under 200MB.');
+                return;
+            }
+            
+            const info = document.getElementById('videoInfo');
+            info.innerHTML = '<div style="text-align: center; padding: 10px;">⏳ Loading video file...</div>';
+            info.classList.add('active');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedMedia.video = {
+                    filename: file.name,
+                    size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
+                    data: e.target.result
+                };
+                
+                console.log('✅ Video file loaded into memory');
+                
+                info.innerHTML = `
+                    <div class="file-info-content">
+                        <span style="font-size: 2rem;">🎬</span>
+                        <div>
+                            <strong>✅ ${file.name}</strong><br>
+                            <small>${uploadedMedia.video.size}</small>
+                        </div>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Auto-update grid (recommended method)
+        async function autoUpdateGrid() {
+            console.log('🚀 Auto-update started');
+            console.log('Current cell:', currentCell);
+            console.log('Uploaded media:', uploadedMedia);
+            
+            if (!currentCell) {
+                alert('⚠️ Please select a cell first!');
+                return;
+            }
+            
+            if (!uploadedMedia.image && !uploadedMedia.audio && !uploadedMedia.video) {
+                alert('⚠️ Please upload at least one media file!');
+                return;
+            }
+            
+            if (!currentGrid) {
+                alert('⚠️ No grid selected!');
+                return;
+            }
+            
+            // Show loading
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Updating...';
+            btn.disabled = true;
+            
+            try {
+                // Build media data
+                const mediaData = {};
+                const cellPrefix = `Cell${currentCell.cellNumber}-`;
+                
+                if (uploadedMedia.image) {
+                    console.log('📷 Saving image file...');
+                    // Add cell number prefix to filename
+                    const newFilename = cellPrefix + uploadedMedia.image.filename;
+                    // Save image file
+                    const imageResponse = await fetch('/api/save-media-file', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename: newFilename,
+                            data: uploadedMedia.image.data,
+                            type: 'image'
+                        })
+                    });
+                    
+                    if (imageResponse.ok) {
+                        console.log('✅ Image saved successfully');
+                        const altText = newFilename.replace(/\.[^/.]+$/, '').replace(/-/g, ' ');
+                        mediaData.image = `/grids/images/${newFilename}`;
+                        mediaData.imageAlt = altText;
+                    } else {
+                        console.error('❌ Image save failed:', await imageResponse.text());
+                    }
+                }
+                
+                if (uploadedMedia.audio) {
+                    console.log('🎧 Saving audio file...');
+                    // Add cell number prefix to filename
+                    const newFilename = cellPrefix + uploadedMedia.audio.filename;
+                    // Save audio file
+                    const audioResponse = await fetch('/api/save-media-file', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename: newFilename,
+                            data: uploadedMedia.audio.data,
+                            type: 'audio'
+                        })
+                    });
+                    
+                    if (audioResponse.ok) {
+                        console.log('✅ Audio saved successfully');
+                        mediaData.audioUrl = `/grids/audio/${newFilename}`;
+                        mediaData.audioTitle = `Audio (${uploadedMedia.audio.size})`;
+                        mediaData.audioSize = uploadedMedia.audio.size;
+                    } else {
+                        console.error('❌ Audio save failed:', await audioResponse.text());
+                    }
+                }
+                
+                if (uploadedMedia.video) {
+                    console.log('🎬 Saving video file...');
+                    // Add cell number prefix to filename
+                    const newFilename = cellPrefix + uploadedMedia.video.filename;
+                    // Save video file
+                    const videoResponse = await fetch('/api/save-media-file', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename: newFilename,
+                            data: uploadedMedia.video.data,
+                            type: 'video'
+                        })
+                    });
+                    
+                    if (videoResponse.ok) {
+                        console.log('✅ Video saved successfully');
+                        mediaData.videoUrl = `/grids/videos/${newFilename}`;
+                        mediaData.videoTitle = `Video (${uploadedMedia.video.size})`;
+                        mediaData.videoSize = uploadedMedia.video.size;
+                    } else {
+                        console.error('❌ Video save failed:', await videoResponse.text());
+                    }
+                }
+                
+                console.log('📝 Updating grid file with media data:', mediaData);
+                
+                // Update cell in grid file
+                const response = await fetch('/api/update-cell-media', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        gridId: currentGrid,
+                        cellLevel: 'L1',
+                        cellIndex: currentCell.index,
+                        mediaData: mediaData
+                    })
+                });
+                
+                console.log('Server response status:', response.status);
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Reload grid to show updated badges
+                    await loadGrid(currentGrid);
+                    
+                    // Clear uploads
+                    clearUploads();
+                    
+                    // Show success panel
+                    document.getElementById('uploadSection').style.display = 'none';
+                    document.getElementById('updatedCellName').textContent = `Cell ${currentCell.index + 1} (${currentCell.position})`;
+                    document.getElementById('successPanel').style.display = 'block';
+                    document.getElementById('successPanel').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    console.error('Update failed:', result.error);
+                    alert('❌ Error updating grid: ' + result.error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+                
+            } catch (error) {
+                console.error('Error updating grid:', error);
+                alert('❌ Failed to update grid: ' + error.message + '\n\nCheck console for details.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Generate code (manual method)
+        function generateCode() {
+            if (!currentCell) {
+                alert('⚠️ Please select a cell first!');
+                return;
+            }
+            
+            if (!uploadedMedia.image && !uploadedMedia.audio && !uploadedMedia.video) {
+                alert('⚠️ Please upload at least one media file!');
+                return;
+            }
+            
+            let code = '// Add these lines to your cell data:\n\n';
+            
+            if (uploadedMedia.image) {
+                const altText = uploadedMedia.image.filename.replace(/\.[^/.]+$/, '').replace(/-/g, ' ');
+                code += `image: "images/${uploadedMedia.image.filename}",\n`;
+                code += `imageAlt: "${altText}",\n`;
+            }
+            
+            if (uploadedMedia.audio) {
+                code += `\naudioUrl: "audio/${uploadedMedia.audio.filename}",\n`;
+                code += `audioTitle: "Audio (${uploadedMedia.audio.size})",\n`;
+                code += `audioSize: "${uploadedMedia.audio.size}",\n`;
+            }
+            
+            if (uploadedMedia.video) {
+                code += `\nvideoUrl: "videos/${uploadedMedia.video.filename}",\n`;
+                code += `videoTitle: "Video (${uploadedMedia.video.size})",\n`;
+                code += `videoSize: "${uploadedMedia.video.size}",\n`;
+            }
+            
+            document.getElementById('codeOutput').textContent = code;
+            document.getElementById('targetCellName').textContent = `Cell ${currentCell.index + 1} (${currentCell.position})`;
+            document.getElementById('codePanel').style.display = 'block';
+            document.getElementById('codePanel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Copy code to clipboard
+        function copyCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Code copied to clipboard!');
+            });
+        }
+
+        // Select code on click
+        function selectCode() {
+            const range = document.createRange();
+            range.selectNodeContents(document.getElementById('codeOutput'));
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        // Clear uploads
+        function clearUploads() {
+            uploadedMedia = { image: null, audio: null, video: null };
+            document.getElementById('imageInput').value = '';
+            document.getElementById('audioInput').value = '';
+            document.getElementById('videoInput').value = '';
+            document.querySelectorAll('.file-info').forEach(el => {
+                el.classList.remove('active');
+                el.innerHTML = '';
+            });
+        }
+
+        // Start over
+        function startOver() {
+            clearUploads();
+            document.getElementById('codePanel').style.display = 'none';
+            document.getElementById('successPanel').style.display = 'none';
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('cellPanel').scrollIntoView({ behavior: 'smooth' });
+            
+            // Reset button
+            const btn = document.querySelector('.btn-success');
+            if (btn) {
+                btn.innerHTML = '🚀 Auto-Update Grid (Recommended!)';
+                btn.disabled = false;
+            }
+        }
+
+        // Drag and drop support
+        ['imageDropZone', 'audioDropZone', 'videoDropZone'].forEach(id => {
+            const zone = document.getElementById(id);
+            
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const inputId = id.replace('DropZone', 'Input');
+                    const input = document.getElementById(inputId);
+                    input.files = files;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+
+        // Load grids on page load
+        loadGrids();
+    </script>
+</body>
+</html>
