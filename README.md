@@ -1,6 +1,10 @@
-# 📐 Fractal Grids Platform
+# 🌐 Fractal Grids Platform
 
-A self-hosted platform for managing and deploying multiple interactive fractal grid visualizations in the classroom.
+An interactive educational platform for creating and displaying hierarchical, bilingual learning content using fractal grid structures. Features multimedia support, student survey integration, and visual tools for content management.
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)
 
 ## 🚀 Quick Start
 
