@@ -128,6 +128,17 @@
             background: #1a252f;
         }
 
+        .btn.survey {
+            background: #27ae60;
+            color: white;
+            border-color: #229954;
+        }
+
+        .btn.survey:hover {
+            background: #229954;
+            transform: scale(1.05);
+        }
+
         .btn.back {
             background: #e8e8e8;
         }
@@ -419,6 +430,33 @@
             opacity: 0.8;
         }
 
+        /* Cell number indicator in bottom-left corner */
+        .cell-number {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            opacity: 0.5;
+            color: #333;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        body.fullscreen-mode .cell-number {
+            font-size: 0.65rem;
+            bottom: 4px;
+            left: 4px;
+            padding: 1px 4px;
+        }
+
+        .subgrid .cell-number {
+            font-size: 0.7rem;
+            padding: 1px 4px;
+        }
+
         /* Multimedia Styles */
         .cell-image {
             width: 100%;
@@ -672,6 +710,7 @@
         <button id="flipAll" class="btn flip-all">Flip All 🔄</button>
         <button id="langToggle" class="btn lang-toggle">UI Language: EN 🌐</button>
         <button id="fullscreen" class="btn fullscreen">Presentation Mode 🖥️</button>
+        <button id="surveyBtn" class="btn survey" onclick="window.open('http://localhost:8501', '_blank')" title="Complete your weekly reflection">📝 Weekly Survey</button>
     </div>
 
     <div id="gridContainer" class="grid-container">
@@ -693,67 +732,67 @@
             ],
             L1: [
                 {titleEn: "Mount Fuji", titleZh: "富士山", contentEn: "Japan's sacred mountain", contentZh: "日本的神圣山脉", descEn: "3,776m, last erupted 1707", descZh: "海拔3,776米，最后喷发于1707年",    
-                audioUrl: "/grids/audio/Mount Fuji_ Sleeping Giant, Sacred Mountain.mp3",
+                audioUrl: "/grids/audio/Cell1-Mount Fuji_ Sleeping Giant, Sacred Mountain.mp3",
                 audioTitle: "Audio (13.2 MB)",
                 audioSize: "13.2 MB",
-                videoUrl: "/grids/videos/Mount Fuji_ Sleeping Giant, Sacred Mountain.mp4",
+                videoUrl: "/grids/videos/Cell1-Mount Fuji_ Sleeping Giant, Sacred Mountain.mp4",
                 videoTitle: "Video (33.2 MB)",
                 videoSize: "33.2 MB", cellClass: ""},
                 {titleEn: "Volcanic Threats", titleZh: "火山威胁", contentEn: "Dangers posed", contentZh: "构成的危险", descEn: "Ash, lava, displacement", descZh: "火山灰、熔岩、流离失所", 
-                audioUrl: "/grids/audio/Volcanoes_ Dangers and Stories from the Ring of Fire.mp3",
+                audioUrl: "/grids/audio/Cell2-Volcanoes_ Dangers and Stories from the Ring of Fire.mp3",
                 audioTitle: "Audio (10.3 MB)",
                 audioSize: "10.3 MB",
-                videoUrl: "/grids/videos/Volcanoes_ Dangers and Stories from the Ring of Fire2.mp4",
+                videoUrl: "/grids/videos/Cell2-Volcanoes_ Dangers and Stories from the Ring of Fire2.mp4",
                 videoTitle: "Video (28.9 MB)",
                 videoSize: "28.9 MB", cellClass: ""},
                 {titleEn: "Scientific Monitoring", titleZh: "科学监测", contentEn: "Tracking activity", contentZh: "追踪活动", descEn: "Earthquake detection", descZh: "地震检测", 
-                audioUrl: "/grids/audio/Living with Volcanoes.mp3",
+                audioUrl: "/grids/audio/Cell3-Living with Volcanoes.mp3",
                 audioTitle: "Audio (15.2 MB)",
                 audioSize: "15.2 MB",
-                videoUrl: "/grids/videos/Living with Volcanoes(1).mp4",
+                videoUrl: "/grids/videos/Cell3-Living with Volcanoes(1).mp4",
                 videoTitle: "Video (36.8 MB)",
                 videoSize: "36.8 MB", cellClass: ""},
                 {titleEn: "Popocatépetl", titleZh: "波波卡特佩特火山", contentEn: "Mexico's smoking mountain", contentZh: "墨西哥的冒烟之山", descEn: "World's tallest active", descZh: "世界最高活火山",  
-                audioUrl: "/grids/audio/The Smoking Mountain_ Popocatépetl’s Power and the People Nearby.mp3",
+                audioUrl: "/grids/audio/Cell4-The Smoking Mountain_ Popocatepetls Power and the People Nearby.mp3",
                 audioTitle: "Audio (14.3 MB)",
                 audioSize: "14.3 MB",
-                videoUrl: "/grids/videos/The Smoking Mountain_ Popocatépetl’s Power and the People Nearby.mp4",
+                videoUrl: "/grids/videos/Cell4-The Smoking Mountain_ Popocatepetls Power and the People Nearby.mp4",
                 videoTitle: "Video (39.5 MB)",
                 videoSize: "39.5 MB", cellClass: ""},
                 {titleEn: "VIOLENT EARTH", titleZh: "暴烈地球", contentEn: "Sacred summits", contentZh: "神圣高峰", descEn: "Creators and destroyers", descZh: "创造者和毁灭者", 
-                audioUrl: "/grids/audio/The Two Faces of Volcanoes.mp3",
+                audioUrl: "/grids/audio/Cell0-The Two Faces of Volcanoes.mp3",
                 audioTitle: "Audio (8.7 MB)",
                 audioSize: "8.7 MB",
-                videoUrl: "/grids/videos/The Two Faces of Volcanoes(1).mp4",
+                videoUrl: "/grids/videos/Cell0-The Two Faces of Volcanoes(1).mp4",
                 videoTitle: "Video (25.3 MB)",
                 videoSize: "25.3 MB",
                 cellClass: "subsun"},
                 {titleEn: "Religious Significance", titleZh: "宗教意义", contentEn: "Spiritual meaning", contentZh: "精神意义", descEn: "Sacred holy sites", descZh: "神圣圣地", 
-                audioUrl: "/grids/audio/Sacred Volcanoes and Their Magic.mp3",
+                audioUrl: "/grids/audio/Cell5-Sacred Volcanoes and Their Magic.mp3",
                 audioTitle: "Audio (9.8 MB)",
                 audioSize: "9.8 MB",
-                videoUrl: "/grids/videos/Sacred Volcanoes and Their Magic.mp4",
+                videoUrl: "/grids/videos/Cell5-Sacred Volcanoes and Their Magic.mp4",
                 videoTitle: "Video (27.7 MB)",
                 videoSize: "27.7 MB", cellClass: ""},
                 {titleEn: "Human Settlement", titleZh: "人类定居", contentEn: "Living near danger", contentZh: "居住在危险附近", descEn: "Rich volcanic soils", descZh: "富含火山土壤", 
-                audioUrl: "/grids/audio/Why People Live by Volcanoes.mp3",
-                audioTitle: "Audio (12.7 MB)",
-                audioSize: "12.7 MB",
-                videoUrl: "/grids/videos/Why Live Next to a Volcano_.mp4",
-                videoTitle: "Video (13.6 MB)",
-                videoSize: "13.6 MB", cellClass: ""},
+                audioUrl: "/grids/audio/Cell6-Why People Live Near Volcanoes.mp3",
+                audioTitle: "Audio (15.4 MB)",
+                audioSize: "15.4 MB",
+                videoUrl: "/grids/videos/Cell6-Why People Live Near Volcanoes.mp4",
+                videoTitle: "Video (37.7 MB)",
+                videoSize: "37.7 MB", cellClass: ""},
                 {titleEn: "Cultural Practices", titleZh: "文化习俗", contentEn: "Honoring volcanoes", contentZh: "崇敬火山", descEn: "Ceremonies and rituals", descZh: "仪式和典礼", 
-                audioUrl: "/grids/audio/Magic Mountains and the Secrets of Sacred Volcanoes(1).mp3",
+                audioUrl: "/grids/audio/Cell7-Magic Mountains and the Secrets of Sacred Volcanoes(1).mp3",
                 audioTitle: "Audio (16.1 MB)",
                 audioSize: "16.1 MB",
-                videoUrl: "/grids/videos/Magic Mountains and the Secrets of Sacred Volcanoes(2).mp4",
+                videoUrl: "/grids/videos/Cell7-Magic Mountains and the Secrets of Sacred Volcanoes(2).mp4",
                 videoTitle: "Video (39.1 MB)",
                 videoSize: "39.1 MB", cellClass: ""},
                 {titleEn: "Pacific Ring of Fire", titleZh: "环太平洋火山带", contentEn: "Volcanic zone", contentZh: "火山地带", descEn: "Tectonic plate boundaries", descZh: "构造板块边界", 
-                audioUrl: "/grids/audio/Volcanoes_ Dangers and Stories from the Ring of Fire.mp3",
+                audioUrl: "/grids/audio/Cell2-Volcanoes_ Dangers and Stories from the Ring of Fire.mp3",
                 audioTitle: "Audio (10.3 MB)",
                 audioSize: "10.3 MB",
-                videoUrl: "/grids/videos/Volcanoes_ Dangers and Stories from the Ring of Fire2.mp4",
+                videoUrl: "/grids/videos/Cell2-Volcanoes_ Dangers and Stories from the Ring of Fire2.mp4",
                 videoTitle: "Video (28.9 MB)",
                 videoSize: "28.9 MB", cellClass: ""}
             ],
@@ -911,7 +950,7 @@
         let isFullscreen = false;
         let frontLang = 'en';
 
-        function createCell(cellData, useFullContent = false, position = null) {
+        function createCell(cellData, useFullContent = false, position = null, cellNumber = null) {
             const container = document.createElement('div');
             container.className = 'cell-container';
             
@@ -991,6 +1030,9 @@
             }
             
             frontHTML += `<div class="flip-indicator">🔄</div>`;
+            if (cellNumber !== null) {
+                frontHTML += `<div class="cell-number">${cellNumber}</div>`;
+            }
             front.innerHTML = frontHTML;
             
             // Build back (Chinese) side - similar structure
@@ -1043,6 +1085,9 @@
             }
             
             backHTML += `<div class="flip-indicator">🔄</div>`;
+            if (cellNumber !== null) {
+                backHTML += `<div class="cell-number">${cellNumber}</div>`;
+            }
             back.innerHTML = backHTML;
             
             flipper.appendChild(front);
@@ -1091,7 +1136,10 @@
                 });
             } else if (currentLevel === 1) {
                 contentData.L1.forEach((cellData, index) => {
-                    const cell = createCell(cellData, false, index + 1);
+                    // Cell numbering: 0 for center (index 4), 1-8 for planets
+                    // i=0→1, i=1→2, i=2→3, i=3→4, i=4→0, i=5→5, i=6→6, i=7→7, i=8→8
+                    const cellNumber = index === 4 ? 0 : (index < 4 ? index + 1 : index);
+                    const cell = createCell(cellData, false, index + 1, cellNumber);
                     grid.appendChild(cell);
                 });
             } else if (currentLevel === 2 && selectedSubgrid === null) {
